@@ -8,16 +8,32 @@ var sizePattern_3 = /^\s*h(\d{0,4})w(\d{0,4})(?:\-(c|m|s))?(?:\-(g|b\d{1,4}))?(?
 module.exports = function(port){
     http.createServer(function(request, response) {
         var paths = request.url.split('/')
-        if(paths.length<=2){
-            throw404();
-            return
+        var size = "";
+        if(setting.azureCDN){
+            if(paths.length<=3){
+                throw404();
+                return
+            }
+            
+            if(paths[1]!=="cdn" || paths[2]!==setting.folderName ){
+                throw404();
+                return
+            }
+            var size = paths[3];
+            paths.splice(0,4);
+
+        }else{
+            if(paths.length<=2){
+                throw404();
+                return
+            }
+            if(paths[1]!==setting.folderName){
+                throw404();
+                return
+            }
+            var size = paths[2];
+            paths.splice(0,3);
         }
-        if(paths[1]!==setting.folderName){
-            throw404();
-            return
-        }
-        var size = paths[2];
-        paths.splice(0,3);
         var m1 = size.match(sizePattern)
         var m2 = null;
         var m3 = null;
