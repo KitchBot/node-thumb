@@ -1,6 +1,6 @@
 module.exports ={
     container :'images',
     account:'',
-    key:''
+    key:'',
     folderName:'images'
 }
