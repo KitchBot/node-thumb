@@ -9,6 +9,7 @@
   "author": "Casear Chu <casear.chu@chuto.tw> (http://casear.chuto.tw/)",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1.35",
     "azure-storage": "^0.4.3",
     "sharp": "^0.9.3"
   }

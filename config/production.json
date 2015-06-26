@@ -1,0 +1,18 @@
+{
+    "azure": {
+        "container": "",
+        "account": "",
+        "key": "",
+        "folderName": "",
+        "heartbeat": ""
+    },
+    "aws": {
+        "container": "",
+        "account": "",
+        "key": "",
+        "folderName": "",
+        "region": "",
+        "heartbeat": ""
+    },
+    "default": "aws"
+}
