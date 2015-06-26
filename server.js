@@ -1,4 +1,4 @@
-var setting = require('./settings')
+var setting = require('./config')
 var azure = require('azure-storage');
 var aws = require('aws-sdk');
 var http = require('http');
