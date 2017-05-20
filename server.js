@@ -5,6 +5,7 @@ var http = require('http');
 var sharp = require('sharp');
 
 var sizePattern = /^\/(?:s(\d{0,4})|(?:w(\d{1,4}))?(?:h(\d{1,4}))?)(?:\-(c|m|s))?(?:-(g)?(?:b(\d{1,4}))?)?\/(.+)$/
+
 var blobService = azure.createBlobService(setting.azure.account, setting.azure.key);
 
 aws.config.update({
@@ -50,7 +51,7 @@ module.exports = function(port) {
                 r: 255,
                 g: 255,
                 b: 255,
-                a: 0
+                alpha: 0
             }).embed()
         }
 
