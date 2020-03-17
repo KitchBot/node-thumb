@@ -9,8 +9,9 @@
   "author": "Casear Chu <casear.chu@chuto.tw> (http://casear.chuto.tw/)",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/storage": "^4.6.0",
     "aws-sdk": "*",
     "azure-storage": "*",
-    "sharp": "*"
+    "sharp": "^0.25.1"
   }
 }

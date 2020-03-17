@@ -14,5 +14,8 @@
         "region": "",
         "heartbeat": ""
     },
-    "default": "aws"
+    "gcs":{
+        "bucket":"kitchbot"
+    },
+    "default": "gcs"
 }

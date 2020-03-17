@@ -3,11 +3,15 @@ var azure = require('azure-storage');
 var aws = require('aws-sdk');
 var http = require('http');
 var sharp = require('sharp');
-
+var path = require("path")
+var fs = require("fs")
 var sizePattern = /^\/(?:s(\d{0,4})|(?:w(\d{1,4}))?(?:h(\d{1,4}))?)(?:\-(c|m|s))?(?:-(g)?(?:b(\d{1,4}))?)?\/(.+)$/
+var blobService = null
+if(setting.azure.account)
+    blobService = azure.createBlobService(setting.azure.account, setting.azure.key);
 
-var blobService = azure.createBlobService(setting.azure.account, setting.azure.key);
-
+const {Storage} = require('@google-cloud/storage');
+const storage = new Storage();
 aws.config.update({
     accessKeyId: setting.aws.account,
     secretAccessKey: setting.aws.key,
@@ -15,8 +19,9 @@ aws.config.update({
 });
 var s3 = new aws.S3();
 
+
 module.exports = function(port) {
-    var server = http.createServer(function(request, response) {
+    var server = http.createServer(async function(request, response) {
         
         var m = request.url.match(sizePattern)
         if (m == null) {
@@ -36,18 +41,18 @@ module.exports = function(port) {
             h = parseInt(m[3])
         }
         filepath = m[7]
-        var transform = sharp().resize(w, h)
+        var transform = sharp()
         if (m[4]) {
             switch (m[4]) {
                 case "c":
-                    transform = transform.crop(sharp.gravity.center);
+                    transform = transform.resize(w, h,{position: sharp.strategy.center});
                     break;
                 case "m":
-                    transform = transform.max();
+                    transform = transform.resize(w, h).max();
                     break;
             }
         } else {
-            transform = transform.background({
+            transform = transform.resize(w, h).background({
                 r: 255,
                 g: 255,
                 b: 255,
@@ -66,6 +71,8 @@ module.exports = function(port) {
         response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         if (setting.default === 'azure') {
             getFromAzure(transform, filepath, response)
+        }else if(setting.default === 'gcs'){
+            getFromGCS(transform, filepath, response)
         } else {
             getFromAWS(transform, filepath, response)
         }
@@ -114,6 +121,17 @@ module.exports = function(port) {
             .pipe(response);
         });
             
+    }
+    async function getFromGCS(transform, filepath, response) {
+        const filename = "/tmp/" + path.basename(filepath)
+        await storage
+          .bucket(setting.gcs.bucket)
+          .file(filepath)
+          .download({destination: filename})
+        fs.createReadStream(filename)
+          .pipe(transform)
+          .pipe(response);
+          
     }
 
     function throw404(response) {
