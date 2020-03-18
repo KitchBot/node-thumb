@@ -22,7 +22,10 @@ var s3 = new aws.S3();
 
 module.exports = function(port) {
     var server = http.createServer(async function(request, response) {
-        
+        if(request.url=='/healthcheck'){
+            healthcheck(response);
+            return;
+        }
         var m = request.url.match(sizePattern)
         if (m == null) {
             throw404(response);
@@ -44,20 +47,23 @@ module.exports = function(port) {
         var transform = sharp()
         if (m[4]) {
             switch (m[4]) {
-                case "c":
-                    transform = transform.resize(w, h,{position: sharp.strategy.center});
-                    break;
                 case "m":
                     transform = transform.resize(w, h).max();
                     break;
+                default:
+                    transform = transform.resize(w, h,{position: sharp.strategy.center});
+                    break;
+                
             }
         } else {
-            transform = transform.resize(w, h).background({
+            transform = transform.resize(w, h, {
+                background:{
                 r: 255,
                 g: 255,
                 b: 255,
                 alpha: 0
-            }).embed()
+                }
+            })
         }
 
         if (m[5] != undefined) {
@@ -78,7 +84,11 @@ module.exports = function(port) {
         }
 
     })
-
+    function healthcheck(response){
+        response.writeHead(200);
+        response.end('ok');
+        return;
+    }
     function getFromAWS(transform, filepath, response) {
         var d = require('domain').create();
         d.on('error', function(error){
